@@ -114,16 +114,18 @@ void change_pos(char figure_type, char change_type, int start, int end) {
     *(level_array+end) = figure_type;
 }
 
-void load_level1() {
+void load_level1(char* level_array_ptr) {
     level_h = height_of_file("level1.txt");
     level_w = width_of_file("level1.txt");
     char level_array_content[level_h*level_w+1]; // +1 for special '\0' null character
-    level_array = level_array_content;
-    load_level("level1.txt", level_array);
+    level_array_ptr = level_array_content;
+    load_level("level1.txt", level_array_ptr);
     find_pos_of_player(&p);
 
     //change_pos(player_c, void_c, p.x+(p.y-1)*(level_w+1), p.x+p.y*(level_w+1));
     // *(level_array+4)=' ';
+    printf("h = %d , w = %d\n", level_h, level_w);
+    printf(level_array_ptr);
     
 }
 
@@ -165,7 +167,9 @@ void game_loop() {
 }
 
 int main() {
-    load_level1();
+    //load_level1(level_array);
+    load_level("level1.txt", level_array);
+    //sleep(2);
     printf("%s", level_array);
     printf("\n\nThis is the level\n\n");
     sleep(2);
