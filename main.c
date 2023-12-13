@@ -9,6 +9,7 @@
 
 struct object p = {.x=-1, .y=-1};
 struct object ms = {.x=-1, .y=-1};
+struct object ghost = {.x=-1, .y=-1, .velocity = 1};
 
 int length_of_file(char *level_file_name) {
     int length=0;
@@ -62,6 +63,15 @@ void find_pos_of_magic_stone() {
             }
 }
 
+void find_pos_ghost() {
+    for (int i = 0; i < level_h; i++) 
+        for (int j = 0; j < level_w+1; j++) 
+            if (*(level_array+i*(level_w+1)+j)==magic_button) { // level_w+1 - because '\n' symbol
+                ghost.x=j;
+                ghost.y=i;
+            }
+}
+
 void change_pos(char figure_type, char change_type, int start, int end) {
     *(level_array+start) = change_type;
     *(level_array+end) = figure_type;
@@ -91,6 +101,7 @@ void load_level1() {
 
     find_pos_of_player();
     find_pos_of_magic_stone();
+    find_pos_ghost();
 }
 
 void load_level2() {
@@ -102,12 +113,15 @@ void load_level2() {
 
     find_pos_of_player();
     find_pos_of_magic_stone();
+    find_pos_ghost();
 }
 
 void game_loop() {
     while (!GetAsyncKeyState(VK_ESCAPE)) {
         if (GetAsyncKeyState(VK_UP) & 1) {
             if (*(level_array+p.x+(p.y-1)*(level_w+1))==magic_stone_c) load_level2();
+            else
+            if (*(level_array+p.x+(p.y-1)*(level_w+1))==magic_button) break;
             else
             if (*(level_array+p.x+(p.y-1)*(level_w+1))!=wall_c) {
                 p.y=p.y-1;
@@ -117,6 +131,8 @@ void game_loop() {
         if (GetAsyncKeyState(VK_DOWN) & 1) {
             if (*(level_array+p.x+(p.y+1)*(level_w+1))==magic_stone_c) load_level2();
             else
+            if (*(level_array+p.x+(p.y+1)*(level_w+1))==magic_button) break;
+            else
             if (*(level_array+p.x+(p.y+1)*(level_w+1))!=wall_c) {
                 p.y=p.y+1;
                 change_pos(player_c, void_c, p.x+(p.y-1)*(level_w+1), p.x+p.y*(level_w+1));
@@ -124,6 +140,8 @@ void game_loop() {
         }
         if (GetAsyncKeyState(VK_LEFT) & 1) {
             if (*(level_array+p.x-1+p.y*(level_w+1))==magic_stone_c) load_level2();
+            else
+            if (*(level_array+p.x-1+p.y*(level_w+1))==magic_button) break;
             else
             if (*(level_array+p.x-1+p.y*(level_w+1))!=wall_c) {
                 p.x=p.x-1;
@@ -133,11 +151,23 @@ void game_loop() {
         if (GetAsyncKeyState(VK_RIGHT) & 1) {
             if (*(level_array+p.x+1+p.y*(level_w+1))==magic_stone_c) load_level2();
             else
-            if (*(level_array+p.x+1+p.y*(level_w+1))!=wall_c) {
+            if (*(level_array+p.x+1+p.y*(level_w+1))==magic_button) break;
+            else
+            if (*(level_array + p.x + 1 + p.y*(level_w+1))!=wall_c) {
                 p.x=p.x+1;
                 change_pos(player_c, void_c, p.x-1+p.y*(level_w+1), p.x+p.y*(level_w+1));
             }
         }
+        //ghost physics
+        if (*(level_array + ghost.x + ghost.velocity + ghost.y*(level_w+1))!=wall_c) if(*(level_array + ghost.x + ghost.velocity + ghost.y*(level_w+1))==player_c) break; else
+        {
+                ghost.x += ghost.velocity;
+                change_pos(magic_button, void_c, ghost.x-ghost.velocity+ghost.y*(level_w+1), ghost.x+ghost.y*(level_w+1));
+            }
+        else
+        ghost.velocity *= -1;
+
+
         printf(level_array);
         usleep(33333);
         system("cls");

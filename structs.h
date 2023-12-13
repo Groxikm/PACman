@@ -1,6 +1,6 @@
 struct object {
     int x,y;
-    int power;
+    int power, velocity;
 };
 
 struct wall {
@@ -26,7 +26,7 @@ const char wall_c = '#';
 const char player_c = 'A';
 const char void_c = ' ';
 const char magic_stone_c = 'O';
-const char magic_button = 'n';
+const char magic_button = '@';
 
 int ghosts_ivaded = 0;
 int magic_stones = 0;
