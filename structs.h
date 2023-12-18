@@ -30,10 +30,8 @@ const char magic_stone_c = 'O';
 const char ghost_c = '@';
 
 struct lvl_data{
-    int w ;
-    int h;
-    int ghosts_evaded ;
-    int magic_stones;
+    int w,h, number, ghosts_evaded, magic_stones;
     char *map;
-
 };
+
+const unsigned int File_name_limit = 30;
