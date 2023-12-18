@@ -7,8 +7,8 @@
 
 #include "structs.h"
 
-struct object p = {.x=-1, .y=-1, .character = player_c};
-struct object ms = {.x=-1, .y=-1, .character = magic_stone_c};
+struct object player = {.x=-1, .y=-1, .character = player_c};
+struct object magic_stone = {.x=-1, .y=-1, .character = magic_stone_c};
 struct object ghost = {.x=-1, .y=-1, .character = ghost_c, .velocity = 1};
 struct lvl_data lvl = {.w=-1, .h=-1, .ghosts_evaded = 0, .magic_stones = 0, .number = 1};
 
@@ -18,7 +18,6 @@ void setCursorPosition(int x, int y) {
     coord.Y = y;
 
     HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-
     SetConsoleCursorPosition(hConsole, coord);
 }
 
@@ -72,8 +71,7 @@ void change_pos(char figure_type, char change_type, int start, int end) {
 
 void load_level(char *level_file_name, char *array) {
     FILE *fptr = fopen(level_file_name, "r");
-
-    int i=0;
+    int i = 0;
     char ch;
     while ((ch=fgetc(fptr))!=EOF) {
         if (ch==wall_c || ch==player_c || ch==void_c || ch==magic_stone_c || ch==ghost_c || ch=='\n') 
@@ -99,50 +97,50 @@ void load_level_by_number(int level) {
     load_level(levelFileName, lvl.map);
 
     find_pos_of_(&ghost);
-    find_pos_of_(&p);
-    find_pos_of_(&ms);
+    find_pos_of_(&player);
+    find_pos_of_(&magic_stone);
 }
 
 void game_loop() {
     while (!GetAsyncKeyState(VK_ESCAPE)) {
         if (GetAsyncKeyState(VK_UP) & 1) {
-            if (*(lvl.map+p.x+(p.y-1)*(lvl.w+1))==magic_stone_c) load_level_by_number(++lvl.number);
+            if (*(lvl.map+player.x+(player.y-1)*(lvl.w+1))==magic_stone_c) load_level_by_number(++lvl.number);
             else
-            if (*(lvl.map+p.x+(p.y-1)*(lvl.w+1))==ghost_c) break;
+            if (*(lvl.map+player.x+(player.y-1)*(lvl.w+1))==ghost_c) break;
             else
-            if (*(lvl.map+p.x+(p.y-1)*(lvl.w+1))!=wall_c) {
-                p.y=p.y-1;
-                change_pos(player_c, void_c, p.x+(p.y+1)*(lvl.w+1), p.x+p.y*(lvl.w+1));
+            if (*(lvl.map+player.x+(player.y-1)*(lvl.w+1))!=wall_c) {
+                player.y=player.y-1;
+                change_pos(player_c, void_c, player.x+(player.y+1)*(lvl.w+1), player.x+player.y*(lvl.w+1));
             }
         }
         if (GetAsyncKeyState(VK_DOWN) & 1) {
-            if (*(lvl.map+p.x+(p.y+1)*(lvl.w+1))==magic_stone_c) load_level_by_number(++lvl.number);
+            if (*(lvl.map+player.x+(player.y+1)*(lvl.w+1))==magic_stone_c) load_level_by_number(++lvl.number);
             else
-            if (*(lvl.map+p.x+(p.y+1)*(lvl.w+1))==ghost_c) break;
+            if (*(lvl.map+player.x+(player.y+1)*(lvl.w+1))==ghost_c) break;
             else
-            if (*(lvl.map+p.x+(p.y+1)*(lvl.w+1))!=wall_c) {
-                p.y=p.y+1;
-                change_pos(player_c, void_c, p.x+(p.y-1)*(lvl.w+1), p.x+p.y*(lvl.w+1));
+            if (*(lvl.map+player.x+(player.y+1)*(lvl.w+1))!=wall_c) {
+                player.y=player.y+1;
+                change_pos(player_c, void_c, player.x+(player.y-1)*(lvl.w+1), player.x+player.y*(lvl.w+1));
             }
         }
         if (GetAsyncKeyState(VK_LEFT) & 1) {
-            if (*(lvl.map+p.x-1+p.y*(lvl.w+1))==magic_stone_c) load_level_by_number(++lvl.number);
+            if (*(lvl.map+player.x-1+player.y*(lvl.w+1))==magic_stone_c) load_level_by_number(++lvl.number);
             else
-            if (*(lvl.map+p.x-1+p.y*(lvl.w+1))==ghost_c) break;
+            if (*(lvl.map+player.x-1+player.y*(lvl.w+1))==ghost_c) break;
             else
-            if (*(lvl.map+p.x-1+p.y*(lvl.w+1))!=wall_c) {
-                p.x=p.x-1;
-                change_pos(player_c, void_c, p.x+1+p.y*(lvl.w+1), p.x+p.y*(lvl.w+1));
+            if (*(lvl.map+player.x-1+player.y*(lvl.w+1))!=wall_c) {
+                player.x=player.x-1;
+                change_pos(player_c, void_c, player.x+1+player.y*(lvl.w+1), player.x+player.y*(lvl.w+1));
             }
         }
         if (GetAsyncKeyState(VK_RIGHT) & 1) {
-            if (*(lvl.map+p.x+1+p.y*(lvl.w+1))==magic_stone_c) load_level_by_number(++lvl.number);
+            if (*(lvl.map+player.x+1+player.y*(lvl.w+1))==magic_stone_c) load_level_by_number(++lvl.number);
             else
-            if (*(lvl.map+p.x+1+p.y*(lvl.w+1))==ghost_c) break;
+            if (*(lvl.map+player.x+1+player.y*(lvl.w+1))==ghost_c) break;
             else
-            if (*(lvl.map + p.x + 1 + p.y*(lvl.w+1))!=wall_c) {
-                p.x=p.x+1;
-                change_pos(player_c, void_c, p.x-1+p.y*(lvl.w+1), p.x+p.y*(lvl.w+1));
+            if (*(lvl.map + player.x + 1 + player.y*(lvl.w+1))!=wall_c) {
+                player.x=player.x+1;
+                change_pos(player_c, void_c, player.x-1+player.y*(lvl.w+1), player.x+player.y*(lvl.w+1));
             }
         }
         //ghost physics
@@ -153,7 +151,6 @@ void game_loop() {
                 change_pos(ghost_c, void_c, ghost.x-ghost.velocity+ghost.y*(lvl.w+1), ghost.x+ghost.y*(lvl.w+1));
             }
         else ghost.velocity *= -1;
-
 
         printf(lvl.map);
         usleep(33333);
