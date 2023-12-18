@@ -86,34 +86,26 @@ void load_level(char *level_file_name, char *array) {
     fclose(fptr);
 }
 
-void load_level1() {
-    lvl.h = height_of_file("level1.txt");
-    lvl.w = width_of_file("level1.txt");
-    lvl.map = (char*) malloc(lvl.h*(lvl.w+1)*sizeof(char));
-    load_level("level1.txt", lvl.map);
+void load_level_by_number(int level) {
+    char levelFileName[20];
+    sprintf(levelFileName, "level%d.txt", level);
 
-    find_pos_of_(&ghost);
-    find_pos_of_(&p);
-    find_pos_of_(&ms);
+    if (lvl.map != NULL) free(lvl.map);
     
-}
+    lvl.h = height_of_file(levelFileName);
+    lvl.w = width_of_file(levelFileName);
+    lvl.map = (char*) malloc(lvl.h * (lvl.w + 1) * sizeof(char));
+    load_level(levelFileName, lvl.map);
 
-void load_level2() {
-    free(lvl.map);
-    lvl.h = height_of_file("level2.txt");
-    lvl.w = width_of_file("level2.txt");
-    lvl.map = (char*) malloc(lvl.h*(lvl.w+1)*sizeof(char));
-    load_level("level2.txt", lvl.map);
-
+    find_pos_of_(&ghost);
     find_pos_of_(&p);
     find_pos_of_(&ms);
-    find_pos_of_(&ghost);
 }
 
 void game_loop() {
     while (!GetAsyncKeyState(VK_ESCAPE)) {
         if (GetAsyncKeyState(VK_UP) & 1) {
-            if (*(lvl.map+p.x+(p.y-1)*(lvl.w+1))==magic_stone_c) load_level2();
+            if (*(lvl.map+p.x+(p.y-1)*(lvl.w+1))==magic_stone_c) load_level_by_number(2);
             else
             if (*(lvl.map+p.x+(p.y-1)*(lvl.w+1))==ghost_c) break;
             else
@@ -123,7 +115,7 @@ void game_loop() {
             }
         }
         if (GetAsyncKeyState(VK_DOWN) & 1) {
-            if (*(lvl.map+p.x+(p.y+1)*(lvl.w+1))==magic_stone_c) load_level2();
+            if (*(lvl.map+p.x+(p.y+1)*(lvl.w+1))==magic_stone_c) load_level_by_number(2);
             else
             if (*(lvl.map+p.x+(p.y+1)*(lvl.w+1))==ghost_c) break;
             else
@@ -133,7 +125,7 @@ void game_loop() {
             }
         }
         if (GetAsyncKeyState(VK_LEFT) & 1) {
-            if (*(lvl.map+p.x-1+p.y*(lvl.w+1))==magic_stone_c) load_level2();
+            if (*(lvl.map+p.x-1+p.y*(lvl.w+1))==magic_stone_c) load_level_by_number(2);
             else
             if (*(lvl.map+p.x-1+p.y*(lvl.w+1))==ghost_c) break;
             else
@@ -143,7 +135,7 @@ void game_loop() {
             }
         }
         if (GetAsyncKeyState(VK_RIGHT) & 1) {
-            if (*(lvl.map+p.x+1+p.y*(lvl.w+1))==magic_stone_c) load_level2();
+            if (*(lvl.map+p.x+1+p.y*(lvl.w+1))==magic_stone_c) load_level_by_number(2);
             else
             if (*(lvl.map+p.x+1+p.y*(lvl.w+1))==ghost_c) break;
             else
@@ -170,7 +162,7 @@ void game_loop() {
 
 int main() {
     char *header = "level1.txt";
-    load_level1();
+    load_level_by_number(1);
     game_loop();
 
     free(lvl.map);
