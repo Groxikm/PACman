@@ -1,6 +1,7 @@
 struct object {
     int x,y;
     int power, velocity;
+    char character;
 };
 
 struct wall {
@@ -26,11 +27,13 @@ const char wall_c = '#';
 const char player_c = 'A';
 const char void_c = ' ';
 const char magic_stone_c = 'O';
-const char magic_button = '@';
+const char ghost_c = '@';
 
-int ghosts_ivaded = 0;
-int magic_stones = 0;
-int level_w = 0;
-int level_h = 0;
+struct lvl_data{
+    int w ;
+    int h;
+    int ghosts_evaded ;
+    int magic_stones;
+    char *map;
 
-char *level_array;
+};
