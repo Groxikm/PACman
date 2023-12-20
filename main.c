@@ -143,7 +143,7 @@ void game_loop(struct object *player, struct object *ghost, struct object *magic
             if(*(lvl->map + ghost->x + ghost->velocity + ghost->y*(lvl->w+1))==player_c) break; 
             else {
                 ghost->x += ghost->velocity;
-                change_pos(ghost_c, void_c, ghost->x-ghost->velocity+ghost->y*(lvl->w+1), ghost->x+ghost->y*(lvl->w+1));
+                change_pos(ghost_c, void_c, ghost->x-ghost->velocity+ghost->y*(lvl->w+1), ghost->x+ghost->y*(lvl->w+1), &lvl);
             }
         else ghost->velocity *= -1;
 
