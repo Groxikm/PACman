@@ -91,51 +91,51 @@ void load_level_by_number(int level_number, struct object *player, struct object
     lvl->map = (char*) malloc(lvl->h * (lvl->w + 1) * sizeof(char));
     load_level(levelFileName, lvl->map);
 
-    find_pos_of_(&ghost, &lvl);
-    find_pos_of_(&player, &lvl);
-    find_pos_of_(&magic_stone, &lvl);
+    find_pos_of_(ghost, lvl);
+    find_pos_of_(player, lvl);
+    find_pos_of_(magic_stone, lvl);
 }
 
 void game_loop(struct object *player, struct object *ghost, struct object *magic_stone, struct lvl_data *lvl) {
     while (!GetAsyncKeyState(VK_ESCAPE)) {
         if (GetAsyncKeyState(VK_UP) & 1) {
-            if (*(lvl->map+player->x+(player->y-1)*(lvl->w+1))==magic_stone_c) load_level_by_number(++lvl->number, &player, &ghost, &magic_stone, &lvl);
+            if (*(lvl->map+player->x+(player->y-1)*(lvl->w+1))==magic_stone_c) load_level_by_number(++lvl->number, player, ghost, magic_stone, lvl);
             else
             if (*(lvl->map+player->x+(player->y-1)*(lvl->w+1))==ghost_c) break;
             else
             if (*(lvl->map+player->x+(player->y-1)*(lvl->w+1))!=wall_c) {
                 player->y=player->y-1;
-                change_pos(player_c, void_c, player->x+(player->y+1)*(lvl->w+1), player->x+player->y*(lvl->w+1), &lvl);
+                change_pos(player_c, void_c, player->x+(player->y+1)*(lvl->w+1), player->x+player->y*(lvl->w+1), lvl);
             }
         }
         if (GetAsyncKeyState(VK_DOWN) & 1) {
-            if (*(lvl->map+player->x+(player->y+1)*(lvl->w+1))==magic_stone_c) load_level_by_number(++lvl->number, &player, &ghost, &magic_stone, &lvl);
+            if (*(lvl->map+player->x+(player->y+1)*(lvl->w+1))==magic_stone_c) load_level_by_number(++lvl->number, player, ghost, magic_stone, lvl);
             else
             if (*(lvl->map+player->x+(player->y+1)*(lvl->w+1))==ghost_c) break;
             else
             if (*(lvl->map+player->x+(player->y+1)*(lvl->w+1))!=wall_c) {
                 player->y=player->y+1;
-                change_pos(player_c, void_c, player->x+(player->y-1)*(lvl->w+1), player->x+player->y*(lvl->w+1), &lvl);
+                change_pos(player_c, void_c, player->x+(player->y-1)*(lvl->w+1), player->x+player->y*(lvl->w+1), lvl);
             }
         }
         if (GetAsyncKeyState(VK_LEFT) & 1) {
-            if (*(lvl->map+player->x-1+player->y*(lvl->w+1))==magic_stone_c) load_level_by_number(++lvl->number, &player, &ghost, &magic_stone, &lvl);
+            if (*(lvl->map+player->x-1+player->y*(lvl->w+1))==magic_stone_c) load_level_by_number(++lvl->number, player, ghost, magic_stone, lvl);
             else
             if (*(lvl->map+player->x-1+player->y*(lvl->w+1))==ghost_c) break;
             else
             if (*(lvl->map+player->x-1+player->y*(lvl->w+1))!=wall_c) {
                 player->x=player->x-1;
-                change_pos(player_c, void_c, player->x+1+player->y*(lvl->w+1), player->x+player->y*(lvl->w+1), &lvl);
+                change_pos(player_c, void_c, player->x+1+player->y*(lvl->w+1), player->x+player->y*(lvl->w+1), lvl);
             }
         }
         if (GetAsyncKeyState(VK_RIGHT) & 1) {
-            if (*(lvl->map+player->x+1+player->y*(lvl->w+1))==magic_stone_c) load_level_by_number(++lvl->number, &player, &ghost, &magic_stone, &lvl);
+            if (*(lvl->map+player->x+1+player->y*(lvl->w+1))==magic_stone_c) load_level_by_number(++lvl->number, player, ghost, magic_stone, lvl);
             else
             if (*(lvl->map+player->x+1+player->y*(lvl->w+1))==ghost_c) break;
             else
             if (*(lvl->map + player->x + 1 + player->y*(lvl->w+1))!=wall_c) {
                 player->x=player->x+1;
-                change_pos(player_c, void_c, player->x-1+player->y*(lvl->w+1), player->x+player->y*(lvl->w+1), &lvl);
+                change_pos(player_c, void_c, player->x-1+player->y*(lvl->w+1), player->x+player->y*(lvl->w+1), lvl);
             }
         }
         //ghost physics
@@ -143,12 +143,12 @@ void game_loop(struct object *player, struct object *ghost, struct object *magic
             if(*(lvl->map + ghost->x + ghost->velocity + ghost->y*(lvl->w+1))==player_c) break; 
             else {
                 ghost->x += ghost->velocity;
-                change_pos(ghost_c, void_c, ghost->x-ghost->velocity+ghost->y*(lvl->w+1), ghost->x+ghost->y*(lvl->w+1), &lvl);
+                change_pos(ghost_c, void_c, ghost->x-ghost->velocity+ghost->y*(lvl->w+1), ghost->x+ghost->y*(lvl->w+1), lvl);
             }
         else ghost->velocity *= -1;
 
         printf(lvl->map);
-        usleep(33333);
+        usleep(43333);
         setCursorPosition(0,0);
     }
 }
