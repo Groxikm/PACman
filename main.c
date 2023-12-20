@@ -16,6 +16,13 @@ void setCursorPosition(int x, int y) {
     SetConsoleCursorPosition(hConsole, coord);
 }
 
+void hideCursor() {
+    CONSOLE_CURSOR_INFO cursorInfo;
+    cursorInfo.dwSize = 1; // Set the cursor size to 1 (invisible)
+    cursorInfo.bVisible = FALSE; // Hide the cursor
+    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
+}
+
 int width_of_file(char *level_file_name) {
     int length=0;
     char ch;
@@ -32,7 +39,8 @@ int height_of_file(char *level_file_name) {
     char ch;
     FILE *fptr = fopen(level_file_name, "r");
 
-    while ((ch=fgetc(fptr))!=EOF) if (ch=='\n') length++;
+    while ((ch=fgetc(fptr))!=EOF) 
+        if (ch=='\n') length++;
     
     fclose(fptr);
     return ++length;
@@ -41,7 +49,7 @@ int height_of_file(char *level_file_name) {
 void find_pos_of_(struct object *obj, struct lvl_data *lvl) {
     for (int i = 0; i < lvl->h; i++) 
         for (int j = 0; j < lvl->w+1; j++) 
-            if (*(lvl->map+i*(lvl->w+1)+j)== obj->character) { // lvl->w+1 - because '\n' symbol
+            if (*(lvl->map+i*(lvl->w+1)+j)== obj->character) { // lvl->w+1 for '\n' symbol
                 obj->x=j;
                 obj->y=i;
             }
@@ -126,7 +134,7 @@ void game_loop(struct object *player, struct object *ghost, struct object *magic
                 change_pos(player_c, void_c, player->x-1 +player->y*(lvl->w+1), player->x +player->y*(lvl->w+1), lvl);
             }
         }
-        //ghost physics
+        //ghost physics. horizontal moving
         if (*(lvl->map + ghost->x + ghost->velocity + ghost->y*(lvl->w+1))!=wall_c) 
             if(*(lvl->map + ghost->x + ghost->velocity + ghost->y*(lvl->w+1))==player_c) break; 
             else {
@@ -147,6 +155,7 @@ int main() {
     struct object magic_stone = {.x=-1, .y=-1, .character = magic_stone_c};
     struct object ghost = {.x=-1, .y=-1, .character = ghost_c, .velocity = 1};
     struct lvl_data lvl = {.w=-1, .h=-1, .ghosts_evaded = 0, .magic_stones = 0, .number = 1};
+    hideCursor();
     load_level_by_number(lvl.number, &player, &ghost, &magic_stone, &lvl);
     game_loop(&player, &ghost, &magic_stone, &lvl);
 

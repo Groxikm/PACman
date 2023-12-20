@@ -15,4 +15,5 @@ const char void_c = ' ';
 const char magic_stone_c = 'O';
 const char ghost_c = '@';
 
+
 const unsigned int File_name_limit = 30;
