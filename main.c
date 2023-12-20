@@ -100,7 +100,7 @@ void game_loop(struct object *player, struct object *ghost, struct object *magic
             if (*(lvl->map +player->x +(player->y-1)*(lvl->w+1))==ghost_c) break;
             else
             if (*(lvl->map +player->x +(player->y-1)*(lvl->w+1))!=wall_c) {
-                player->y=player->y-1;
+                player->y-=1;
                 change_pos(player_c, void_c, player->x +(player->y+1)*(lvl->w+1), player->x+player->y*(lvl->w+1), lvl);
             }
         }
@@ -110,7 +110,7 @@ void game_loop(struct object *player, struct object *ghost, struct object *magic
             if (*(lvl->map +player->x +(player->y+1)*(lvl->w+1))==ghost_c) break;
             else
             if (*(lvl->map +player->x +(player->y+1)*(lvl->w+1))!=wall_c) {
-                player->y=player->y+1;
+                player->y+=1;
                 change_pos(player_c, void_c, player->x +(player->y-1)*(lvl->w+1), player->x+player->y*(lvl->w+1), lvl);
             }
         }
@@ -120,7 +120,7 @@ void game_loop(struct object *player, struct object *ghost, struct object *magic
             if (*(lvl->map +player->x-1 +player->y*(lvl->w+1))==ghost_c) break;
             else
             if (*(lvl->map +player->x-1 +player->y*(lvl->w+1))!=wall_c) {
-                player->x=player->x-1;
+                player->x-=1;
                 change_pos(player_c, void_c, player->x +1+ player->y*(lvl->w+1), player->x+player->y*(lvl->w+1), lvl);
             }
         }
@@ -130,7 +130,7 @@ void game_loop(struct object *player, struct object *ghost, struct object *magic
             if (*(lvl->map +player->x+1 +player->y*(lvl->w+1))==ghost_c) break;
             else
             if (*(lvl->map +player->x+1 +player->y*(lvl->w+1))!=wall_c) {
-                player->x=player->x+1;
+                player->x+=1;
                 change_pos(player_c, void_c, player->x-1 +player->y*(lvl->w+1), player->x +player->y*(lvl->w+1), lvl);
             }
         }
