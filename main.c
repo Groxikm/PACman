@@ -7,45 +7,6 @@
 
 #include "structs.h"
 
-void setCursorPosition(int x, int y) {
-    COORD coord;
-    coord.X = x;
-    coord.Y = y;
-
-    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    SetConsoleCursorPosition(hConsole, coord);
-}
-
-void hideCursor() {
-    CONSOLE_CURSOR_INFO cursorInfo;
-    cursorInfo.dwSize = 1; // Set the cursor size to 1 (invisible)
-    cursorInfo.bVisible = FALSE; // Hide the cursor
-    SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
-}
-
-int width_of_file(char *level_file_name) {
-    int length=0;
-    char ch;
-    FILE *fptr = fopen(level_file_name, "r");
-
-    while ((ch=fgetc(fptr))!='\n') length++;
-
-    fclose(fptr);
-    return length;
-}
-
-int height_of_file(char *level_file_name) {
-    int length=0;
-    char ch;
-    FILE *fptr = fopen(level_file_name, "r");
-
-    while ((ch=fgetc(fptr))!=EOF) 
-        if (ch=='\n') length++;
-    
-    fclose(fptr);
-    return ++length;
-}
-
 void find_pos_of_(struct object *obj, struct lvl_data *lvl) {
     for (int i = 0; i < lvl->h; i++) 
         for (int j = 0; j < lvl->w+1; j++) 
@@ -55,18 +16,21 @@ void find_pos_of_(struct object *obj, struct lvl_data *lvl) {
             }
 }
 
-void load_level(char *level_file_name, char *array) {
+void load_level(char *level_file_name, struct lvl_data *lvl) {
     FILE *fptr = fopen(level_file_name, "r");
-    int i = 0;
+    int i;
+    lvl->ghosts_amount, i = 0;
     char ch;
     while ((ch=fgetc(fptr))!=EOF) {
-        if (ch==wall_c || ch==player_c || ch==void_c || ch==magic_stone_c || ch==ghost_c || ch=='\n') 
-            *(array+i) = ch;
+        if (ch==wall_c || ch==player_c || ch==void_c || ch==magic_stone_c || ch==ghost_c || ch=='\n') {
+            *(lvl->map+i) = ch;
+            if (ch==ghost_c) lvl->ghosts_amount++;
+            }
         else 
-            *(array+i) = void_c;
+            *(lvl->map+i) = void_c;
         i++;
     }
-    *(array+i)='\0';
+    *(lvl->map+i)='\0';
     fclose(fptr);
 }
 
@@ -79,7 +43,7 @@ void load_level_by_number(int level_number, struct object *player, struct object
     lvl->h = height_of_file(levelFileName);
     lvl->w = width_of_file(levelFileName);
     lvl->map = (char*) malloc(lvl->h * (lvl->w + 1) * sizeof(char));
-    load_level(levelFileName, lvl->map);
+    load_level(levelFileName, lvl);
 
     find_pos_of_(ghost, lvl);
     find_pos_of_(player, lvl);
@@ -145,7 +109,7 @@ void game_loop(struct object *player, struct object *ghost, struct lvl_data *lvl
             {change_object_pos(ghost_c, void_c, 0, ghost->velocity, ghost, lvl); }
         else ghost->velocity *= -1;
 
-        printf(lvl->map);
+        printf(lvl->map); printf("\nghost amount: %d", lvl->ghosts_amount);
         usleep(43333);
         setCursorPosition(0,0);
     }
@@ -155,7 +119,7 @@ int main() {
     struct object player = {.x=-1, .y=-1, .character = player_c};
     struct object magic_stone = {.x=-1, .y=-1, .character = magic_stone_c};
     struct object ghost = {.x=-1, .y=-1, .character = ghost_c, .velocity = 1};
-    struct lvl_data lvl = {.w=-1, .h=-1, .ghosts_evaded = 0, .magic_stones = 0, .number = 1};
+    struct lvl_data lvl = {.w=-1, .h=-1, .magic_stones = 0, .number = 1};
 
     hideCursor();
     load_level_by_number(lvl.number, &player, &ghost, &lvl);
