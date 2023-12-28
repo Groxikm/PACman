@@ -85,9 +85,11 @@ void load_level_by_number(int level_number, struct object *player, struct object
     find_pos_of_(player, lvl);
 }
 
-void change_object_pos(char figure_type, char change_type, int start, int end, int y_change, int x_change, struct object *object, struct lvl_data *lvl) {
-    //object->y += y_change;
-    //object->x += x_change;
+void change_object_pos(char figure_type, char change_type, int y_change, int x_change, struct object *object, struct lvl_data *lvl) {
+    object->y += y_change;
+    object->x += x_change;
+    int start = object->x+ +(object->y)*(lvl->w+1);
+    int end = object->x+x_change +(object->y+y_change)*(lvl->w+1);
     *(lvl->map+start) = change_type;
     *(lvl->map+end) = figure_type; 
 }
@@ -106,7 +108,7 @@ void game_loop(struct object *player, struct object *ghost, struct lvl_data *lvl
             if (is_the_character_after_movement_(ghost_c, player, lvl, -step, 0)) break;
             else
             if (!is_the_character_after_movement_(wall_c, player, lvl, -step, 0)) {
-                player->y-=step; change_object_pos(player->character, void_c, player->x +(player->y+step)*(lvl->w+1), player->x +player->y*(lvl->w+1), 0, 0, player, lvl); //player->y-=step;
+                player->y-=step; change_object_pos(player->character, void_c, 0, 0, player, lvl); //player->y-=step;
             }
         }
         if (GetAsyncKeyState(VK_DOWN) & 1) {
@@ -115,7 +117,7 @@ void game_loop(struct object *player, struct object *ghost, struct lvl_data *lvl
             if (is_the_character_after_movement_(ghost_c, player, lvl, step, 0)) break;
             else
             if (!is_the_character_after_movement_(wall_c, player, lvl, step, 0)) {
-                player->y+=step; change_object_pos(player->character, void_c, player->x +(player->y-step)*(lvl->w+1), player->x +player->y*(lvl->w+1), 0, 0, player, lvl); //player->y+=step;
+                player->y+=step; change_object_pos(player->character, void_c, 0, 0, player, lvl); //player->y+=step;
             }
         }
         if (GetAsyncKeyState(VK_LEFT) & 1) {
@@ -124,7 +126,7 @@ void game_loop(struct object *player, struct object *ghost, struct lvl_data *lvl
             if (is_the_character_after_movement_(ghost_c, player, lvl, 0, -step)) break;
             else
             if (!is_the_character_after_movement_(wall_c, player, lvl, 0, -step)) {
-                player->x-=step; change_object_pos(player->character, void_c, player->x +step +player->y*(lvl->w+1), player->x +player->y*(lvl->w+1), 0, 0, player, lvl); //player->x-=step;
+                player->x-=step; change_object_pos(player->character, void_c, 0, 0, player, lvl); //player->x-=step;
             }
         }
         if (GetAsyncKeyState(VK_RIGHT) & 1) {
@@ -133,14 +135,14 @@ void game_loop(struct object *player, struct object *ghost, struct lvl_data *lvl
             if (is_the_character_after_movement_(ghost_c, player, lvl, 0, step)) break;
             else
             if (!is_the_character_after_movement_(wall_c, player, lvl, 0, step)) {
-                player->x+=step; change_object_pos(player->character, void_c, player->x -step +player->y*(lvl->w+1), player->x +player->y*(lvl->w+1), 0, 0, player, lvl); //player->x+=step;
+                player->x+=step; change_object_pos(player->character, void_c, 0, 0, player, lvl); //player->x+=step;
             }
         }
 
         if (!is_the_character_after_movement_(wall_c, ghost, lvl, 0, ghost->velocity))
             if(is_the_character_after_movement_(player->character, ghost, lvl, 0, ghost->velocity)) break; 
             else 
-            {ghost->x += ghost->velocity; change_object_pos(ghost_c, void_c, ghost->x -ghost->velocity +ghost->y*(lvl->w+1), ghost->x +ghost->y*(lvl->w+1), 0, ghost->velocity, ghost, lvl); }
+            {change_object_pos(ghost_c, void_c, 0, ghost->velocity, ghost, lvl); }
         else ghost->velocity *= -1;
 
         printf(lvl->map);
