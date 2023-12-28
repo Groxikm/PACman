@@ -1,7 +1,7 @@
 #define File_name_limit 30
 #define ghost_limit 8
 #define step 1
-#define max_level_number 4
+#define max_level_number 3
 
 const char wall_c = '#';
 const char player_c = 'A';

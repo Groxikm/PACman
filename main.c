@@ -27,7 +27,8 @@ void ghost_instance_init(struct lvl_data *lvl, int position){
 
 void load_level(char *level_file_name, struct lvl_data *lvl) {
     FILE *fptr = fopen(level_file_name, "r");
-    int i;
+    memset(lvl->ghost_array, 0, sizeof(lvl->ghost_array));
+    int i;   
     lvl->ghosts_amount, i = 0;
     char ch;
     while ((ch=fgetc(fptr))!=EOF) {
