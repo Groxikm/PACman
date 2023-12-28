@@ -33,9 +33,7 @@ void load_level(char *level_file_name, struct lvl_data *lvl) {
     char ch;
     while ((ch=fgetc(fptr))!=EOF) {
         if (ch==wall_c || ch==player_c || ch==void_c || ch==magic_stone_c || ch==ghost_c || ch=='\n') {
-            if (ch==ghost_c && lvl->ghosts_amount < ghost_limit) {
-                lvl->ghosts_amount++; ghost_instance_init(lvl,i);
-                } // initializing ghosts
+            if (ch==ghost_c && lvl->ghosts_amount < ghost_limit) {lvl->ghosts_amount++; ghost_instance_init(lvl,i);} // initializing ghosts
             *(lvl->map+i) = ch;
             }
         else 
@@ -78,40 +76,28 @@ int is_the_character_after_movement_(char character, struct object *object, stru
 int game_loop(struct object *player, struct lvl_data *lvl) {
     while (!GetAsyncKeyState(VK_ESCAPE)) {
         if (GetAsyncKeyState(VK_UP) & 1) {
-            if (is_the_character_after_movement_(magic_stone_c, player, lvl, -step, 0)) {
-                if(lvl->number >= max_level_number) return 1;
-                load_level_by_number(++lvl->number, player, lvl);
-                } //(*(lvl->map +player->x +(player->y-1)*(lvl->w+1))==magic_stone_c)
+            if (is_the_character_after_movement_(magic_stone_c, player, lvl, -step, 0)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x +(player->y-1)*(lvl->w+1))==magic_stone_c)
             else
             if (!is_the_character_after_movement_(wall_c, player, lvl, -step, 0)) {
                 change_object_pos(player->character, void_c, -step, 0, player, lvl); //player->y-=step;
             }
         }
         if (GetAsyncKeyState(VK_DOWN) & 1) {
-            if (is_the_character_after_movement_(magic_stone_c, player, lvl,  step, 0)) {
-                if(lvl->number >= max_level_number) return 1;
-                load_level_by_number(++lvl->number, player, lvl);
-                }  //(*(lvl->map +player->x +(player->y+1)*(lvl->w+1))==magic_stone_c)
+            if (is_the_character_after_movement_(magic_stone_c, player, lvl,  step, 0)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x +(player->y+1)*(lvl->w+1))==magic_stone_c)
             else
             if (!is_the_character_after_movement_(wall_c, player, lvl,  step, 0)) {
                 change_object_pos(player->character, void_c, step, 0, player, lvl); //player->y+=step;
             }
         }
         if (GetAsyncKeyState(VK_LEFT) & 1) {
-            if (is_the_character_after_movement_(magic_stone_c, player, lvl, 0, -step)) {
-                if(lvl->number >= max_level_number) return 1;
-                load_level_by_number(++lvl->number, player, lvl);
-                } //(*(lvl->map +player->x-1 +player->y*(lvl->w+1))==magic_stone_c)                 
+            if (is_the_character_after_movement_(magic_stone_c, player, lvl, 0, -step)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x-1 +player->y*(lvl->w+1))==magic_stone_c)
             else
             if (!is_the_character_after_movement_(wall_c, player, lvl, 0, -step)) {
                 change_object_pos(player->character, void_c, 0, -step, player, lvl); //player->x-=step;
             }
         }
         if (GetAsyncKeyState(VK_RIGHT) & 1) {
-            if (is_the_character_after_movement_(magic_stone_c, player, lvl, 0,  step)) {
-                if(lvl->number >= max_level_number) return 1;
-                load_level_by_number(++lvl->number, player, lvl);
-                } //(*(lvl->map +player->x+1 +player->y*(lvl->w+1))==magic_stone_c)
+            if (is_the_character_after_movement_(magic_stone_c, player, lvl, 0,  step)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x+1 +player->y*(lvl->w+1))==magic_stone_c)
             else
             if (!is_the_character_after_movement_(wall_c, player, lvl, 0,  step)) {
                 change_object_pos(player->character, void_c, 0, step, player, lvl); //player->x+=step;
@@ -145,9 +131,6 @@ int main() {
     switch (game_loop(&player, &lvl)){
         case 0:
         printf("END GAME... PRESSED ESC \n");
-        break;
-        case 1:
-        printf("GAME WON. ALL LEVELS PASSED! \n");
         break;
         case 2:
         printf("END GAME... CAUGHT BY GHOST \n");
