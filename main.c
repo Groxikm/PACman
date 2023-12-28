@@ -9,11 +9,20 @@
 
 void find_pos_of_(struct object *obj, struct lvl_data *lvl) {
     for (int i = 0; i < lvl->h; i++) 
-        for (int j = 0; j < lvl->w+1; j++) 
-            if (*(lvl->map+i*(lvl->w+1)+j)== obj->character) { // lvl->w+1 for '\n' symbol
-                obj->x=j;
+        for (int ii = 0; ii < lvl->w+1; ii++) 
+            if (*(lvl->map+i*(lvl->w+1)+ii)== obj->character) { // lvl->w+1 for '\n' symbol
+                obj->x=ii;
                 obj->y=i;
             }
+}
+
+void ghost_instance_init(struct lvl_data *lvl, int position){
+    int y_pos = position / lvl->w;
+    int x_pos = position % lvl->w;
+    lvl->ghost_array[lvl->ghosts_amount].x = x_pos;
+    lvl->ghost_array[lvl->ghosts_amount].y = y_pos;
+    lvl->ghost_array[lvl->ghosts_amount].character = ghost_c; // Example character
+    lvl->ghost_array[lvl->ghosts_amount].velocity = 1;
 }
 
 void load_level(char *level_file_name, struct lvl_data *lvl) {
@@ -23,8 +32,8 @@ void load_level(char *level_file_name, struct lvl_data *lvl) {
     char ch;
     while ((ch=fgetc(fptr))!=EOF) {
         if (ch==wall_c || ch==player_c || ch==void_c || ch==magic_stone_c || ch==ghost_c || ch=='\n') {
+            if (ch==ghost_c && lvl->ghosts_amount < ghost_limit) {lvl->ghosts_amount++; ghost_instance_init(lvl,i);} // initializing ghosts
             *(lvl->map+i) = ch;
-            if (ch==ghost_c) lvl->ghosts_amount++;
             }
         else 
             *(lvl->map+i) = void_c;
@@ -34,7 +43,7 @@ void load_level(char *level_file_name, struct lvl_data *lvl) {
     fclose(fptr);
 }
 
-void load_level_by_number(int level_number, struct object *player, struct object *ghost, struct lvl_data *lvl) {
+void load_level_by_number(int level_number, struct object *player, struct lvl_data *lvl) {
     if (lvl->map != NULL) free(lvl->map);
     system("cls");
     char levelFileName[File_name_limit];
@@ -45,7 +54,6 @@ void load_level_by_number(int level_number, struct object *player, struct object
     lvl->map = (char*) malloc(lvl->h * (lvl->w + 1) * sizeof(char));
     load_level(levelFileName, lvl);
 
-    find_pos_of_(ghost, lvl);
     find_pos_of_(player, lvl);
 }
 
@@ -64,10 +72,10 @@ int is_the_character_after_movement_(char character, struct object *object, stru
     return 0;
 }
 
-void game_loop(struct object *player, struct object *ghost, struct lvl_data *lvl) {
+void game_loop(struct object *player, struct lvl_data *lvl) {
     while (!GetAsyncKeyState(VK_ESCAPE)) {
         if (GetAsyncKeyState(VK_UP) & 1) {
-            if (is_the_character_after_movement_(magic_stone_c, player, lvl, -step, 0)) load_level_by_number(++lvl->number, player, ghost, lvl); //(*(lvl->map +player->x +(player->y-1)*(lvl->w+1))==magic_stone_c)
+            if (is_the_character_after_movement_(magic_stone_c, player, lvl, -step, 0)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x +(player->y-1)*(lvl->w+1))==magic_stone_c)
             else
             if (is_the_character_after_movement_(ghost_c, player, lvl, -step, 0)) break;
             else
@@ -76,7 +84,7 @@ void game_loop(struct object *player, struct object *ghost, struct lvl_data *lvl
             }
         }
         if (GetAsyncKeyState(VK_DOWN) & 1) {
-            if (is_the_character_after_movement_(magic_stone_c, player, lvl, step, 0)) load_level_by_number(++lvl->number, player, ghost, lvl); //(*(lvl->map +player->x +(player->y+1)*(lvl->w+1))==magic_stone_c)
+            if (is_the_character_after_movement_(magic_stone_c, player, lvl, step, 0)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x +(player->y+1)*(lvl->w+1))==magic_stone_c)
             else
             if (is_the_character_after_movement_(ghost_c, player, lvl, step, 0)) break;
             else
@@ -85,7 +93,7 @@ void game_loop(struct object *player, struct object *ghost, struct lvl_data *lvl
             }
         }
         if (GetAsyncKeyState(VK_LEFT) & 1) {
-            if (is_the_character_after_movement_(magic_stone_c, player, lvl, 0, -step)) load_level_by_number(++lvl->number, player, ghost, lvl); //(*(lvl->map +player->x-1 +player->y*(lvl->w+1))==magic_stone_c)
+            if (is_the_character_after_movement_(magic_stone_c, player, lvl, 0, -step)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x-1 +player->y*(lvl->w+1))==magic_stone_c)
             else
             if (is_the_character_after_movement_(ghost_c, player, lvl, 0, -step)) break;
             else
@@ -94,7 +102,7 @@ void game_loop(struct object *player, struct object *ghost, struct lvl_data *lvl
             }
         }
         if (GetAsyncKeyState(VK_RIGHT) & 1) {
-            if (is_the_character_after_movement_(magic_stone_c, player, lvl, 0, step)) load_level_by_number(++lvl->number, player, ghost, lvl); //(*(lvl->map +player->x+1 +player->y*(lvl->w+1))==magic_stone_c)
+            if (is_the_character_after_movement_(magic_stone_c, player, lvl, 0, step)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x+1 +player->y*(lvl->w+1))==magic_stone_c)
             else
             if (is_the_character_after_movement_(ghost_c, player, lvl, 0, step)) break;
             else
@@ -102,12 +110,13 @@ void game_loop(struct object *player, struct object *ghost, struct lvl_data *lvl
                 change_object_pos(player->character, void_c, 0, step, player, lvl); //player->x+=step;
             }
         }
-
-        if (!is_the_character_after_movement_(wall_c, ghost, lvl, 0, ghost->velocity))
-            if(is_the_character_after_movement_(player->character, ghost, lvl, 0, ghost->velocity)) break; 
+        for(int ii = 0; ii <= lvl->ghosts_amount; ii++) {
+        if (!is_the_character_after_movement_(wall_c, &lvl->ghost_array[ii], lvl, 0, lvl->ghost_array[ii].velocity))
+            if(is_the_character_after_movement_(player->character, &lvl->ghost_array[ii], lvl, 0, lvl->ghost_array[ii].velocity)) break; 
             else 
-            {change_object_pos(ghost_c, void_c, 0, ghost->velocity, ghost, lvl); }
-        else ghost->velocity *= -1;
+            change_object_pos(ghost_c, void_c, 0, lvl->ghost_array[ii].velocity, &lvl->ghost_array[ii], lvl);
+        else lvl->ghost_array[ii].velocity *= -1;
+        }
 
         printf(lvl->map); printf("\nghost amount: %d", lvl->ghosts_amount);
         usleep(43333);
@@ -122,8 +131,8 @@ int main() {
     struct lvl_data lvl = {.w=-1, .h=-1, .magic_stones = 0, .number = 1};
 
     hideCursor();
-    load_level_by_number(lvl.number, &player, &ghost, &lvl);
-    game_loop(&player, &ghost, &lvl);
+    load_level_by_number(lvl.number, &player, &lvl);
+    game_loop(&player, &lvl);
 
     free(lvl.map);
     printf("END GAME...");
