@@ -72,49 +72,43 @@ int is_the_character_after_movement_(char character, struct object *object, stru
     return 0;
 }
 
-void game_loop(struct object *player, struct lvl_data *lvl) {
+int game_loop(struct object *player, struct lvl_data *lvl) {
     while (!GetAsyncKeyState(VK_ESCAPE)) {
         if (GetAsyncKeyState(VK_UP) & 1) {
             if (is_the_character_after_movement_(magic_stone_c, player, lvl, -step, 0)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x +(player->y-1)*(lvl->w+1))==magic_stone_c)
-            else
-            if (is_the_character_after_movement_(ghost_c, player, lvl, -step, 0)) break;
             else
             if (!is_the_character_after_movement_(wall_c, player, lvl, -step, 0)) {
                 change_object_pos(player->character, void_c, -step, 0, player, lvl); //player->y-=step;
             }
         }
         if (GetAsyncKeyState(VK_DOWN) & 1) {
-            if (is_the_character_after_movement_(magic_stone_c, player, lvl, step, 0)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x +(player->y+1)*(lvl->w+1))==magic_stone_c)
+            if (is_the_character_after_movement_(magic_stone_c, player, lvl,  step, 0)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x +(player->y+1)*(lvl->w+1))==magic_stone_c)
             else
-            if (is_the_character_after_movement_(ghost_c, player, lvl, step, 0)) break;
-            else
-            if (!is_the_character_after_movement_(wall_c, player, lvl, step, 0)) {
+            if (!is_the_character_after_movement_(wall_c, player, lvl,  step, 0)) {
                 change_object_pos(player->character, void_c, step, 0, player, lvl); //player->y+=step;
             }
         }
         if (GetAsyncKeyState(VK_LEFT) & 1) {
             if (is_the_character_after_movement_(magic_stone_c, player, lvl, 0, -step)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x-1 +player->y*(lvl->w+1))==magic_stone_c)
             else
-            if (is_the_character_after_movement_(ghost_c, player, lvl, 0, -step)) break;
-            else
             if (!is_the_character_after_movement_(wall_c, player, lvl, 0, -step)) {
                 change_object_pos(player->character, void_c, 0, -step, player, lvl); //player->x-=step;
             }
         }
         if (GetAsyncKeyState(VK_RIGHT) & 1) {
-            if (is_the_character_after_movement_(magic_stone_c, player, lvl, 0, step)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x+1 +player->y*(lvl->w+1))==magic_stone_c)
+            if (is_the_character_after_movement_(magic_stone_c, player, lvl, 0,  step)) load_level_by_number(++lvl->number, player, lvl); //(*(lvl->map +player->x+1 +player->y*(lvl->w+1))==magic_stone_c)
             else
-            if (is_the_character_after_movement_(ghost_c, player, lvl, 0, step)) break;
-            else
-            if (!is_the_character_after_movement_(wall_c, player, lvl, 0, step)) {
+            if (!is_the_character_after_movement_(wall_c, player, lvl, 0,  step)) {
                 change_object_pos(player->character, void_c, 0, step, player, lvl); //player->x+=step;
             }
         }
+
         for(int ii = 0; ii <= lvl->ghosts_amount; ii++) {
         if (!is_the_character_after_movement_(wall_c, &lvl->ghost_array[ii], lvl, 0, lvl->ghost_array[ii].velocity))
-            if(is_the_character_after_movement_(player->character, &lvl->ghost_array[ii], lvl, 0, lvl->ghost_array[ii].velocity)) break; 
-            else 
-            change_object_pos(ghost_c, void_c, 0, lvl->ghost_array[ii].velocity, &lvl->ghost_array[ii], lvl);
+            if(is_the_character_after_movement_(player->character, &lvl->ghost_array[ii], lvl, 0, 0) 
+            || is_the_character_after_movement_(player->character, &lvl->ghost_array[ii], lvl, 0, lvl->ghost_array[ii].velocity)) return 2;
+                else 
+                change_object_pos(ghost_c, void_c, 0, lvl->ghost_array[ii].velocity, &lvl->ghost_array[ii], lvl);
         else lvl->ghost_array[ii].velocity *= -1;
         }
 
@@ -122,6 +116,7 @@ void game_loop(struct object *player, struct lvl_data *lvl) {
         usleep(43333);
         setCursorPosition(0,0);
     }
+    return 0;
 }
 
 int main() {
@@ -132,10 +127,17 @@ int main() {
 
     hideCursor();
     load_level_by_number(lvl.number, &player, &lvl);
-    game_loop(&player, &lvl);
+    switch (game_loop(&player, &lvl)){
+        case 0:
+        printf("END GAME... PRESSED ESC \n");
+        break;
+        case 2:
+        printf("END GAME... CAUGHT BY GHOST \n");
+        break;
+    }
 
     free(lvl.map);
-    printf("END GAME...");
+    
     sleep(1);
     return 0;
 }
