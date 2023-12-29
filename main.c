@@ -16,10 +16,8 @@ void find_pos_of_(struct object *obj, struct lvl_data *lvl) {
 }
 
 void ghost_instance_init(struct lvl_data *lvl, int position){
-    int y_pos = position / lvl->w;
-    int x_pos = position % lvl->w;
-    lvl->ghost_array[lvl->ghosts_amount].x = x_pos;
-    lvl->ghost_array[lvl->ghosts_amount].y = y_pos;
+    lvl->ghost_array[lvl->ghosts_amount].x = position % lvl->w;
+    lvl->ghost_array[lvl->ghosts_amount].y = position / lvl->w;
     lvl->ghost_array[lvl->ghosts_amount].character = ghost_c;
     lvl->ghost_array[lvl->ghosts_amount].velocity = 1;
 }
@@ -27,7 +25,7 @@ void ghost_instance_init(struct lvl_data *lvl, int position){
 void load_level(char *level_file_name, struct lvl_data *lvl) {
     FILE *fptr = fopen(level_file_name, "r");
     memset(lvl->ghost_array, 0, sizeof(lvl->ghost_array)); // resetting ghosts instances
-    int i = 0;   
+    int i = 0; 
     lvl->ghosts_amount = 0;
     char ch;
     while ((ch=fgetc(fptr))!=EOF) {
@@ -62,7 +60,7 @@ void load_level_by_number(int level_number, struct object *player, struct lvl_da
 
 void change_object_pos(char figure_type, char change_type, int y_change, int x_change, struct object *object, struct lvl_data *lvl) {    
     int start = object->x +(object->y)*(lvl->w+1);
-    int end = object->x+x_change +(object->y+y_change)*(lvl->w+1);
+    int end = object->x +x_change +(object->y+y_change)*(lvl->w+1);
     object->y += y_change;
     object->x += x_change;
     *(lvl->map+start) = change_type;
@@ -70,7 +68,7 @@ void change_object_pos(char figure_type, char change_type, int y_change, int x_c
 }
 
 int is_the_character_after_movement_(char character, struct object *object, struct lvl_data *lvl, int y_change, int x_change) {
-    if (*(lvl->map +object->x+x_change +(object->y+y_change)*(lvl->w+1))==character) 
+    if (*(lvl->map +object->x +x_change +(object->y+y_change)*(lvl->w+1))==character) 
         return 1;
     return 0;
 }
@@ -114,16 +112,16 @@ int game_loop(struct object *player, struct lvl_data *lvl) {
                 }
         }
 
-        for(int ii = 0; ii <= lvl->ghosts_amount; ii++) {
+        for(int ii = 0; ii <= (lvl->ghosts_amount+0); ii++) {
             if (!is_the_character_after_movement_(wall_c, &lvl->ghost_array[ii], lvl, 0, lvl->ghost_array[ii].velocity))
                 if (is_the_character_after_movement_(player->character, &lvl->ghost_array[ii], lvl, 0, 0) || is_the_character_after_movement_(player->character, &lvl->ghost_array[ii], lvl, 0, lvl->ghost_array[ii].velocity))  {
-                    change_object_pos(ghost_c, void_c, 0, lvl->ghost_array[ii].velocity, &lvl->ghost_array[ii], lvl); 
+                    change_object_pos(lvl->ghost_array[ii].character, void_c, 0, lvl->ghost_array[ii].velocity, &lvl->ghost_array[ii], lvl); 
                     return 2;
                     }// in case current and the char after movement is player -- game over
                     else change_object_pos(ghost_c, void_c, 0, lvl->ghost_array[ii].velocity, &lvl->ghost_array[ii], lvl);
             else lvl->ghost_array[ii].velocity *= -1;
         }
-        printf(lvl->map); printf("\nLevel %d of %d", lvl->number, max_level_number);
+        printf(lvl->map); printf("\nLevel %d of %d", lvl->number, max_level_number); printf("\n ghosts amount %d", lvl->ghosts_amount);
         usleep(43333);
         setCursorPosition(0,0);
     }
@@ -133,7 +131,7 @@ int game_loop(struct object *player, struct lvl_data *lvl) {
 int main() {
     struct object player = {.x=-1, .y=-1, .character = player_c};
     struct object ghost = {.x=-1, .y=-1, .character = ghost_c, .velocity = 1};
-    struct lvl_data lvl = {.w=-1, .h=-1, .magic_stones = 0, .number = 1};
+    struct lvl_data lvl = {.w=-1, .h=-1, .magic_stones = 0, .number = 4};
     hideCursor();
     load_level_by_number(lvl.number, &player, &lvl);
     switch (game_loop(&player, &lvl)) {
