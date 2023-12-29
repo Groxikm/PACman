@@ -123,7 +123,7 @@ int game_loop(struct object *player, struct lvl_data *lvl) {
                     else change_object_pos(ghost_c, void_c, 0, lvl->ghost_array[ii].velocity, &lvl->ghost_array[ii], lvl);
             else lvl->ghost_array[ii].velocity *= -1;
         }
-        printf(lvl->map); printf("\nLevel%d of %d", lvl->ghosts_amount, max_level_number);
+        printf(lvl->map); printf("\nLevel %d of %d", lvl->number, max_level_number);
         usleep(43333);
         setCursorPosition(0,0);
     }
