@@ -131,7 +131,7 @@ int game_loop(struct object *player, struct lvl_data *lvl) {
 int main() {
     struct object player = {.x=-1, .y=-1, .character = player_c};
     struct object ghost = {.x=-1, .y=-1, .character = ghost_c, .velocity = 1};
-    struct lvl_data lvl = {.w=-1, .h=-1, .magic_stones = 0, .number = 4};
+    struct lvl_data lvl = {.w=-1, .h=-1, .magic_stones = 0, .number = 1};
     hideCursor();
     load_level_by_number(lvl.number, &player, &lvl);
     switch (game_loop(&player, &lvl)) {
