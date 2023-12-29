@@ -26,7 +26,7 @@ void ghost_instance_init(struct lvl_data *lvl, int position){
 
 void load_level(char *level_file_name, struct lvl_data *lvl) {
     FILE *fptr = fopen(level_file_name, "r");
-    memset(lvl->ghost_array, 0, sizeof(lvl->ghost_array));
+    memset(lvl->ghost_array, 0, sizeof(lvl->ghost_array)); // resetting ghosts instances
     int i = 0;   
     lvl->ghosts_amount = 0;
     char ch;
@@ -116,14 +116,14 @@ int game_loop(struct object *player, struct lvl_data *lvl) {
 
         for(int ii = 0; ii <= lvl->ghosts_amount; ii++) {
             if (!is_the_character_after_movement_(wall_c, &lvl->ghost_array[ii], lvl, 0, lvl->ghost_array[ii].velocity))
-                if(is_the_character_after_movement_(player->character, &lvl->ghost_array[ii], lvl, 0, 0) || is_the_character_after_movement_(player->character, &lvl->ghost_array[ii], lvl, 0, lvl->ghost_array[ii].velocity))  {
+                if (is_the_character_after_movement_(player->character, &lvl->ghost_array[ii], lvl, 0, 0) || is_the_character_after_movement_(player->character, &lvl->ghost_array[ii], lvl, 0, lvl->ghost_array[ii].velocity))  {
                     change_object_pos(ghost_c, void_c, 0, lvl->ghost_array[ii].velocity, &lvl->ghost_array[ii], lvl); 
                     return 2;
                     }// in case current and the char after movement is player -- game over
                     else change_object_pos(ghost_c, void_c, 0, lvl->ghost_array[ii].velocity, &lvl->ghost_array[ii], lvl);
             else lvl->ghost_array[ii].velocity *= -1;
         }
-        printf(lvl->map); printf("\nghost on map: %d", lvl->ghosts_amount);
+        printf(lvl->map); printf("\nLevel%d of %d", lvl->ghosts_amount, max_level_number);
         usleep(43333);
         setCursorPosition(0,0);
     }
